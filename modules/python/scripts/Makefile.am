@@ -46,6 +46,7 @@ PYSCRIPTS += mwserv.py
 PYSCRIPTS += submit_http.py
 PYSCRIPTS += ndrlib.py
 PYSCRIPTS += logxmpp.py
+PYSCRIPTS += logirc.py
 PYSCRIPTS += fail2ban.py
 PYSCRIPTS += __init__.py
 PYSCRIPTS += mssql/__init__.py

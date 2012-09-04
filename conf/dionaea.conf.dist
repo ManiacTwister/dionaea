@@ -409,6 +409,15 @@ modules = {
 				}
 			}
 		}
+		logirc = {
+			server = "server.irc.tld"
+			port = "6667"
+			channel = "#honeypot"
+			nick = "Honeypot"
+			password = "anonymous"
+			realname = "Honeypot"
+			ident = "Honeypot"
+		}
 		nfq = {
 			/** 
 			 * nfq can intercept incoming tcp connections during the tcp handshake
@@ -458,6 +467,7 @@ modules = {
 //			"mwserv",
 //			"submit_http",
 //			"logxmpp",
+				"logirc",
 //			"nfq",
 //			"p0f",
 //			"surfids",

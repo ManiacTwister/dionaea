@@ -111,6 +111,14 @@ def new():
 			print("client %s \n\tserver %s:%s username %s password %s resource %s muc %s\n\t%s" % (client, conf['server'], conf['port'], conf['username'], conf['password'], resource, conf['muc'], conf['config']))
 			x = dionaea.logxmpp.logxmpp(conf['server'], int(conf['port']), conf['username'], conf['password'], resource, conf['muc'], conf['config'])
 			g_handlers.append(x)
+	if "logirc" in g_dionaea.config()['modules']['python']['ihandlers']['handlers']:
+		import dionaea.logirc
+		from random import choice
+		import string
+		conf = g_dionaea.config()['modules']['python']['logirc']
+		print("server %s:%s nick %s password %s channel %s\n" % (conf['server'], conf['port'], conf['nick'], conf['password'], conf['channel']))
+		x = dionaea.logirc.logirc(conf['server'], int(conf['port']), conf['nick'], conf['password'], conf['ident'], conf['realname'], conf['channel'])
+		g_handlers.append(x)
 
 	if "nfq" in g_dionaea.config()['modules']['python']['ihandlers']['handlers']:
 		import dionaea.nfq
