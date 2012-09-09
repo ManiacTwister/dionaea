@@ -89,7 +89,7 @@ class ircclient:
         while(client.state != "offline"):
             i=i+1
             client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
-            response = client.sock.recv(size).decode('utf-8')
+            response = self.recvSocket()
             '''if "!" in response and ":" in response[response.index(":") + 1:]:
                 return client.parseMessage(response)'''
             if "PING :" in response:
@@ -109,6 +109,15 @@ class ircclient:
     def sendSocket(self, data):
         self.sock.send(bytearray(data, 'utf-8'))
         return
+    def recvSocket(self):
+        data = str()
+        while data.find("\r") == -1:
+          chunk = self.sock.recv(512).decode('utf-8')
+          if chunk == None:
+            return
+          else:
+            data += chunk
+        return data
 
 ''' IRC Client end '''
 
