@@ -48,7 +48,7 @@ import socket
 import re
 from threading import Thread
 
-logger = logging.getLogger('logirc')
+logger = logging.getLogger('logsql')
 logger.setLevel(logging.DEBUG)
 
 
