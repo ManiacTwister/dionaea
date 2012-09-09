@@ -88,6 +88,7 @@ class ircclient:
         i=0
         while(client.state != "offline"):
             i=i+1
+            print "PRIVMSG %s :%s\r\n" % (client.channel, i)
             client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
             response = self.recvSocket()
             '''if "!" in response and ":" in response[response.index(":") + 1:]:
