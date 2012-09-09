@@ -86,6 +86,7 @@ class ircclient:
         return "%s %s" % (nick, message)
     def server_response(self, client):
         i=0
+        logger.debug("Debugircircircirc")
         while(client.state != "offline"):
             i=i+1
             logger.debug("PRIVMSG %s :%s" % (client.channel, i))
