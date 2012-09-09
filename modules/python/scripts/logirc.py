@@ -85,9 +85,10 @@ class ircclient:
         message = message[message.index(":"):]
         return "%s %s" % (nick, message)
     def server_response(self, client):
+        i=0
         while(client.state != "offline"):
-            logger.info("IRC: responseloop!")
-            client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, "message"))
+            i=i+1
+            client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
             response = client.sock.recv(1024).decode('utf-8')
             '''if "!" in response and ":" in response[response.index(":") + 1:]:
                 return client.parseMessage(response)'''
