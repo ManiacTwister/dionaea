@@ -78,6 +78,7 @@ s.listen(1)
 conn, addr = s.accept()
 s.settimeout(0.1)
 while True:
+    print "while"
     try:
         data = conn.recv(256)
     except socket.timeout:
