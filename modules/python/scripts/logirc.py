@@ -48,7 +48,7 @@ import socket
 import re
 from threading import Thread
 
-logger = logging.getLogger('logsql')
+logger = logging.getLogger('logirc')
 logger.setLevel(logging.DEBUG)
 
 
@@ -77,8 +77,9 @@ class ircclient:
         self.sendSocket("JOIN %s\r\n" % self.channel)
         self.state = "online"
         logger.info("logirc is online!")
-        t = Thread(target=self.server_response, args=(self,))
-        t.start()
+        #t = Thread(target=self.server_response, args=(self,))
+        #t.start()
+        self.server_response()
     def parseMessage(self, message):
         nick = message[message.index(":"):message.index("!")]
         message = message[message.index(":") + 1:]
