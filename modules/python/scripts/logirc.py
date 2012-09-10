@@ -56,99 +56,43 @@ def HH(some): return hashlib.md5(some).hexdigest()
 def H(some): return hashlib.md5(some).digest()
 
 
-''' IRC Client begin '''
-
-class ircclient:
-    def __init__(self, server, port, realname, ident, nick, password, channel):
-        self.server = server
-        self.port = port
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
- 
-        self.realname = realname
-        self.ident = ident
-        self.nick = nick
-        self.channel = channel
-        self.state = "offline"
-
-    def connect(self):
-        self.sock.connect((socket.gethostbyname(self.server), self.port))
-        self.sendSocket("USER %s %s DIONAEA :%s\r\n" % (self.ident, self.server, self.realname))
-        self.sendSocket("NICK %s\r\n" % self.nick)
-        self.sendSocket("JOIN %s\r\n" % self.channel)
-        self.state = "online"
-        logger.info("logirc is online!")
-        t = Thread(target=self.server_response, args=(self,))
-        t.start()
-    def parseMessage(self, message):
-        nick = message[message.index(":"):message.index("!")]
-        message = message[message.index(":") + 1:]
-        message = message[message.index(":"):]
-        return "%s %s" % (nick, message)
-    def server_response(self, client):
-        i=0
-        logger.debug("Debugircircircirc")
-        while(client.state != "offline"):
-            i=i+1
-            logger.debug("PRIVMSG %s :%s" % (client.channel, i))
-            client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
-            response = self.recvSocket()
-            '''if "!" in response and ":" in response[response.index(":") + 1:]:
-                return client.parseMessage(response)'''
-            if "PING :" in response:
-               client.sendSocket(response.replace("PING", "PONG"))
-    def send_message(self, message):
-        if not message:
-            logger.info("irclog: send_message without message..")
-        if self.channel:
-            return self.sendSocket("PRIVMSG %s :%s\r\n" % (self.channel, message))
-        else:
-            logger.info("irclog: no channel defined..")
-            return False
-    def close(self):
-        self.state = "offline"
-        self.sock.close()
-        return
-    def sendSocket(self, data):
-        self.sock.send(bytearray(data, 'utf-8'))
-        return
-    def recvSocket(self):
-        data = str()
-        while data.find("\r") == -1:
-          chunk = self.sock.recv(512).decode('utf-8')
-          if chunk == None:
-            return
-          else:
-            data += chunk
-        return data
-
-''' IRC Client end '''
-
 class logirc(ihandler):
   def __init__(self, server, port, nick, password, ident, realname, channel):
     logger.info("logirc started!")
+    self.server = server
+    self.port = port
+    self.realname = realname
     self.ident = ident
     self.nick = nick
-    self.realname = realname
-    self.client = ircclient(server=server, port=port, realname=realname, ident=ident, nick=nick, password=password, channel=channel)
+    self.password = password
+    self.channel = channel
+    #self.client = ircclient(server=server, port=port, realname=realname, ident=ident, nick=nick, password=password, channel=channel)
     ihandler.__init__(self, '*')
 
   def __del__(self):
     self.ident = None
     self.realname = None
     self.nick = None
-    self.client.quit()
     self.client = None
+    self.server = None
+    self.port = None
+    self.password = None
+    self.channel = None
+    self.client.quit()
 
   def start(self):
-    self.client.connect()
+    self.s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    self.s.connect("/tmp/ircdaemon")
+    self.s.send("CONNECT:%s:%s:%s:%s:%s:%s" % (self.server, self.port, self.realname, self.ident, self.nick, self.password, self.channel))
 
   def stop(self):
-    self.client.close()
+    self.state = "offline"
+    self.s.close()
 
   def report(self, i, msg):
-    if self.client is not None and self.client.state != 'online':
+    if self.state != 'online':
       return
-    self.client.send_message(msg)
+    self.s.send("MSG:%s" % msg)
 
   def handle_incident(self, i):
     try:
