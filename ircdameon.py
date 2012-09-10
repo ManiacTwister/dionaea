@@ -78,9 +78,10 @@ s.listen(1)
 conn, addr = s.accept()
 while True:
     print "while"
-    data = conn.recv(256).decode('utf-8')
+    data = conn.recv(256)
     print data
     if not data: break
+    data = data.decode('utf-8')
     print "while2"
     data = data.split(':')
     print data
