@@ -59,7 +59,7 @@ class ircclient:
     def recvSocket(self):
         data = str()
         while data.find("\r") == -1:
-          chunk = self.sock.recv(1024).decode('utf-8')
+          chunk = self.sock.recv(256).decode('utf-8')
           if chunk == None:
             return
           else:
@@ -78,7 +78,7 @@ s.listen(1)
 conn, addr = s.accept()
 while True:
     print "while"
-    data = conn.recv(1024).decode('utf-8')
+    data = conn.recv(256).decode('utf-8')
     print data
     if not data: break
     data = data.split(':')
