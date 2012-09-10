@@ -81,8 +81,10 @@ while True:
     if not data: break
     data.split(':')
     if data[0] == "MSG":
+        print "MSG"
         client.send_message(data[1])
     if data[0] == "CONNECT":
+        print "Connect"
         client = ircclient(server=data[1], port=data[2], realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
         client.connect()
 conn.close()
