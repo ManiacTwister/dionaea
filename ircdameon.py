@@ -75,8 +75,9 @@ except OSError:
 
 s.bind("/tmp/ircdaemon")
 s.listen(1)
+s.setblocking(0)
 conn, addr = s.accept()
-s.settimeout(0.1)
+#s.settimeout(0.1)
 while True:
     print "while"
     try:
