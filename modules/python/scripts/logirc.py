@@ -92,11 +92,12 @@ class ircclient:
             i=i+1
             logger.debug("PRIVMSG %s :%s" % (client.channel, i))
             client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
-            #response = self.recvSocket()
+            response = self.recvSocket()
             '''if "!" in response and ":" in response[response.index(":") + 1:]:
                 return client.parseMessage(response)'''
-            #if "PING :" in response:
-            #   client.sendSocket(response.replace("PING", "PONG"))
+            if "PING :" in response:
+               client.sendSocket(response.replace("PING", "PONG"))
+
     def send_message(self, message):
         if not message:
             logger.info("irclog: send_message without message..")
