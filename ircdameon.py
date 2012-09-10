@@ -81,6 +81,7 @@ while True:
     data = conn.recv(256).decode('utf-8')
     print data
     if not data: break
+    print "while2"
     data = data.split(':')
     print data
     if data[0] == "MSG":
