@@ -202,6 +202,7 @@ void modules_start(void)
 	{
 		g_message("start module %p", it->data);
 		struct module *m = it->data;
+		g_message("test moduletest %s", it->data)
 		if( m->api.start != NULL )
 			m->api.start();
 	}
