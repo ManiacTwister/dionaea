@@ -79,7 +79,7 @@ conn, addr = s.accept()
 while True:
     data = conn.recv(1024).decode('utf-8')
     if not data: break
-    data.split(':')
+    data = data.split(':')
     if data[0] == "MSG":
         print "MSG"
         client.send_message(data[1])
