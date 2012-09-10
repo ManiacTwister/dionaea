@@ -47,6 +47,7 @@ import copy
 import socket
 import re
 from threading import Thread
+import sched, time
 
 logger = logging.getLogger('logirc')
 logger.setLevel(logging.DEBUG)
@@ -79,24 +80,26 @@ class ircclient:
         logger.info("logirc is online!")
         #t = Thread(target=self.server_response, args=(self,))
         #t.start()
-        self.server_response(self)
+        s = sched.scheduler(time.time, time.sleep)
+        sc.enter(60, 1, self.server_response, (sc,self,))
+        s.run()
+        #self.server_response(self)
     def parseMessage(self, message):
         nick = message[message.index(":"):message.index("!")]
         message = message[message.index(":") + 1:]
         message = message[message.index(":"):]
         return "%s %s" % (nick, message)
     def server_response(self, client):
-        i=0
         logger.debug("Debugircircircirc")
-        while(client.state != "offline"):
-            i=i+1
-            logger.debug("PRIVMSG %s :%s" % (client.channel, i))
-            client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
-            response = self.recvSocket()
-            '''if "!" in response and ":" in response[response.index(":") + 1:]:
-                return client.parseMessage(response)'''
-            if "PING :" in response:
-               client.sendSocket(response.replace("PING", "PONG"))
+        #while(client.state != "offline"):
+        logger.debug("PRIVMSG %s :%s" % (client.channel, "test"))
+        client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
+        response = self.recvSocket()
+        '''if "!" in response and ":" in response[response.index(":") + 1:]:
+            return client.parseMessage(response)'''
+        if "PING :" in response:
+           client.sendSocket(response.replace("PING", "PONG"))
+        sc.enter(1, 1, self.server_response, (sc,client,))
 
     def send_message(self, message):
         if not message:
