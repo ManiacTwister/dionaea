@@ -75,12 +75,16 @@ except OSError:
 
 s.bind("/tmp/ircdaemon")
 s.listen(1)
-s.settimeout(0.1)
 conn, addr = s.accept()
+s.settimeout(0.1)
 while True:
-    print "while"
-    data = conn.recv(256)
-    print data
+    try:
+        data = conn.recv(256)
+    except socket.timeout:
+        print "timeout"
+    finally:
+        break;
+
     if not data: break
     data = data.decode('utf-8')
     print "while2"
