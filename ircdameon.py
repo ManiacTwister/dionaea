@@ -66,7 +66,7 @@ class ircclient:
             data += chunk
         return data
 ''' IRC Client end '''
-
+print "start"
 s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 try:
     os.remove("/tmp/ircdaemon")
