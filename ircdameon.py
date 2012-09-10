@@ -77,6 +77,7 @@ s.bind("/tmp/ircdaemon")
 s.listen(1)
 conn, addr = s.accept()
 while True:
+    print "while"
     data = conn.recv(1024).decode('utf-8')
     print data
     if not data: break
