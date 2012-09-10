@@ -79,7 +79,7 @@ class ircclient:
         logger.info("logirc is online!")
         #t = Thread(target=self.server_response, args=(self,))
         #t.start()
-        self.server_response()
+        self.server_response(self)
     def parseMessage(self, message):
         nick = message[message.index(":"):message.index("!")]
         message = message[message.index(":") + 1:]
