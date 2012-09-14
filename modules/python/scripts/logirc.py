@@ -87,12 +87,13 @@ class logirc(ihandler):
     self.s.connect("/tmp/ircdaemon")
     self.s.send("CONNECT:%s:%s:%s:%s:%s:%s\r\n" % (self.server, self.port, self.realname, self.ident, self.nick, self.password, self.channel))
     self.state = "Online"
+    logger.info("Logirc: connected to local socket")
   def stop(self):
     self.state = "Offline"
     self.s.close()
 
   def report(self, i, msg):
-    if self.state != 'Online':
+    if self.state != "Online":
       logger.info("Send irc offline: %s" % msg)
       return
     logger.info("Send irc: %s" % msg)
