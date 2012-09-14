@@ -34,12 +34,12 @@ class ircclient:
         return "%s %s" % (nick, message)
 
     def server_response(self, client):
-        i = 0
+        #i = 0
         #logger.debug("Debugircircircirc")
         while(client.state != "offline"):
-            i = i + 1
+            #i = i + 1
             #logger.debug("PRIVMSG %s :%s" % (client.channel, i))
-            client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
+            #client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
             response = self.recvSocket()
             '''if "!" in response and ":" in response[response.index(":") + 1:]:
                 return client.parseMessage(response)'''
