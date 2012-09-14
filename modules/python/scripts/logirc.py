@@ -85,19 +85,22 @@ class logirc(ihandler):
   def start(self):
     self.s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     self.s.connect("/tmp/ircdaemon")
-    self.s.send("CONNECT:%s:%i:%s:%s:%s:%s:%s\r\n" % (self.server, self.port, self.realname, self.ident, self.nick, self.password, self.channel))
+    self.sendSocket("CONNECT:%s:%i:%s:%s:%s:%s:%s\r\n" % (self.server, self.port, self.realname, self.ident, self.nick, self.password, self.channel))
     self.state = "Online"
     logger.info("Logirc: connected to local socket")
   def stop(self):
     self.state = "Offline"
     self.s.close()
 
+  def sendSocket(self, msg):
+    self.s.send(bytes(msg, 'UTF-8'))
+
   def report(self, i, msg):
     if self.state != "Online":
       logger.info("Send irc offline: %s" % msg)
       return
     logger.info("Send irc: %s" % msg)
-    self.s.send("MSG:%s\r\n" % msg)
+    self.sendSocket("MSG:%s\r\n" % msg)
 
   def handle_incident(self, i):
     try:
