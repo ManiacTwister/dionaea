@@ -5,27 +5,27 @@
 #*
 #*
 #* Copyright (C) 2009  Paul Baecher & Markus Koetter
-#* 
+#*
 #* This program is free software; you can redistribute it and/or
 #* modify it under the terms of the GNU General Public License
 #* as published by the Free Software Foundation; either version 2
 #* of the License, or (at your option) any later version.
-#* 
+#*
 #* This program is distributed in the hope that it will be useful,
 #* but WITHOUT ANY WARRANTY; without even the implied warranty of
 #* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #* GNU General Public License for more details.
-#* 
+#*
 #* You should have received a copy of the GNU General Public License
 #* along with this program; if not, write to the Free Software
 #* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-#* 
-#* 
-#*             contact nepenthesdev@gmail.com  
+#*
+#*
+#*             contact nepenthesdev@gmail.com
 #*
 #*******************************************************************************
 #
-#		Dirty IRC notification module 
+#		Dirty IRC notification module
 #   (c) by ManiacTwister
 #
 #******************************************************************************/
@@ -83,7 +83,7 @@ class logirc(ihandler):
   def start(self):
     self.s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     self.s.connect("/tmp/ircdaemon")
-    self.s.send("CONNECT:%s:%s:%s:%s:%s:%s" % (self.server, self.port, self.realname, self.ident, self.nick, self.password, self.channel))
+    self.s.send("CONNECT:%s:%s:%s:%s:%s:%s\r\n" % (self.server, self.port, self.realname, self.ident, self.nick, self.password, self.channel))
 
   def stop(self):
     self.state = "offline"
@@ -92,7 +92,7 @@ class logirc(ihandler):
   def report(self, i, msg):
     if self.state != 'online':
       return
-    self.s.send("MSG:%s" % msg)
+    self.s.send("MSG:%s\r\n" % msg)
 
   def handle_incident(self, i):
     try:
