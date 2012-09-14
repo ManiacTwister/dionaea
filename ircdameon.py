@@ -89,7 +89,7 @@ except OSError:
 s.bind("/tmp/ircdaemon")
 s.listen(1)
 conn, addr = s.accept()
-conn.setblocking(0)
+#conn.setblocking(0)
 client = None
 #s.settimeout(0.1)
 while True:
