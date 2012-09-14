@@ -79,18 +79,19 @@ class logirc(ihandler):
     self.password = None
     self.channel = None
     self.client.quit()
+    self.state = "Offline"
 
   def start(self):
     self.s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     self.s.connect("/tmp/ircdaemon")
     self.s.send("CONNECT:%s:%s:%s:%s:%s:%s\r\n" % (self.server, self.port, self.realname, self.ident, self.nick, self.password, self.channel))
-
+    self.state = "Online"
   def stop(self):
-    self.state = "offline"
+    self.state = "Offline"
     self.s.close()
 
   def report(self, i, msg):
-    if self.state != 'online':
+    if self.state != 'Online':
       return
     self.s.send("MSG:%s\r\n" % msg)
 
