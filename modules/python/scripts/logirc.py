@@ -92,7 +92,9 @@ class logirc(ihandler):
 
   def report(self, i, msg):
     if self.state != 'Online':
+      logger.info("Send irc offline: %s" % msg)
       return
+    logger.info("Send irc: %s" % msg)
     self.s.send("MSG:%s\r\n" % msg)
 
   def handle_incident(self, i):
