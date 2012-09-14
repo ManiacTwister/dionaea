@@ -66,6 +66,7 @@ class logirc(ihandler):
     self.nick = nick
     self.password = password
     self.channel = channel
+    self.state = "Offline"
     #self.client = ircclient(server=server, port=port, realname=realname, ident=ident, nick=nick, password=password, channel=channel)
     ihandler.__init__(self, '*')
 
