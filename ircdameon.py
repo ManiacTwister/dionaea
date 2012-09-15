@@ -1,6 +1,10 @@
 import socket
 import os
 from threading import Thread
+import logging
+
+
+logging.basicConfig(filename='irclog.log', level=logging.DEBUG)
 
 ''' IRC Client begin '''
 
@@ -23,7 +27,7 @@ class ircclient:
         self.sendSocket("NICK %s\r\n" % self.nick)
         self.sendSocket("JOIN %s\r\n" % self.channel)
         self.state = "online"
-        #logger.info("logirc is online!")
+        logging.info("Connected to IRC")
         t = Thread(target=self.server_response, args=(self,))
         t.start()
 
@@ -35,31 +39,34 @@ class ircclient:
 
     def server_response(self, client):
         #i = 0
-        #logger.debug("Debugircircircirc")
         while(client.state != "offline"):
-            #i = i + 1
-            #logger.debug("PRIVMSG %s :%s" % (client.channel, i))
-            #client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
-            response = self.recvSocket()
-            print response
-            '''if "!" in response and ":" in response[response.index(":") + 1:]:
-                return client.parseMessage(response)'''
-            if "PING :" in response:
-                client.sendSocket(response.replace("PING", "PONG"))
-                client.send_message("Received PING")
+            try:
+                #i = i + 1
+                #logger.debug("PRIVMSG %s :%s" % (client.channel, i))
+                #client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
+                response = self.recvSocket()
+                print response
+                '''if "!" in response and ":" in response[response.index(":") + 1:]:
+                    return client.parseMessage(response)'''
+                if "PING :" in response:
+                    client.sendSocket(response.replace("PING", "PONG"))
+                    logging.debug("Received PING")
+            except KeyboardInterrupt:
+                break
+        return
 
     def send_message(self, message):
         if not message:
-            #logger.info("irclog: send_message without message..")
-            print "irclog: send_message without message.."
+            logging.warning("Executed send_message without a message")
+            return
         if self.channel:
             return self.sendSocket("PRIVMSG %s :%s\r\n" % (self.channel, message))
         else:
-            #logger.info("irclog: no channel defined..")
-            print "irclog: no channel defined.."
+            logging.warning("Executed send_message without a defined channel")
             return False
 
     def close(self):
+        logging.info("Disconnected from IRC")
         self.state = "offline"
         self.sock.close()
         return
@@ -81,38 +88,60 @@ class ircclient:
 ''' IRC Client end '''
 
 
-print "start"
-s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-try:
-    os.remove("/tmp/ircdaemon")
-except OSError:
-    pass
+class daemon:
+    def __init__(self):
+        self.client = None
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
-s.bind("/tmp/ircdaemon")
-s.listen(1)
-conn, addr = s.accept()
-#conn.setblocking(0)
-client = None
-#s.settimeout(0.1)
-while True:
-    print "while"
-    try:
-        data = conn.recv(256)
-    except socket.timeout:
-        print "timeout"
-        continue
+        try:
+            os.remove("/tmp/ircdaemon")
+        except OSError:
+            pass
 
-    if not data:
-        continue
-    data = data.decode('utf-8')
-    print "while2"
-    data = data.split(':')
-    print data
-    if data[0] == "MSG" and client.state != "offline":
-        print "MSG"
-        client.send_message(data[1])
-    if data[0] == "CONNECT":
-        print "Connect"
-        client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
-        client.connect()
-conn.close()
+        s.bind("/tmp/ircdaemon")
+        logging.info("Waiting for a connection")
+        s.listen(1)
+        self.conn, self.addr = s.accept()
+        t = Thread(target=self.recvLocalSocket, args=(self,))
+        t.start()
+
+    def __del__(self):
+        self.conn = None
+        self.addr = None
+        self.client = None
+
+    def recvLocalSocket(self):
+        logging.info("Dionaea connected")
+        while True:
+            try:
+                data = self.conn.recv(256)
+            except socket.timeout:
+                logging.warning("Timeout reveiving localsocket")
+                continue
+            except KeyboardInterrupt:
+                break
+
+            if not data:
+                continue
+
+            data = data.decode('utf-8')
+            data = data.split(':')
+
+            if data[0] == "MSG" and self.client.state != "offline":
+                logging.debug("Received MSG:%s" % data[1])
+                self.client.send_message(data[1])
+            elif data[0] == "CONNECT":
+                logging.debug("Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], data[2], data[3], data[4], data[5], data[7]))
+                self.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
+                self.client.connect()
+            elif data[0] == "DISCONNECT":
+                self.client.close()
+                self.client = None
+        return
+
+    def closeLocalConnection(self):
+        self.conn.close()
+        self.conn = None
+        self.addr = None
+
+d = daemon()
