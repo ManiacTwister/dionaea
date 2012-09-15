@@ -102,7 +102,7 @@ class daemon:
         logging.info("Waiting for a connection")
         s.listen(1)
         self.conn, self.addr = s.accept()
-        t = Thread(target=self.recvLocalSocket, args=(self))
+        t = Thread(target=self.recvLocalSocket, args=(self,))
         t.start()
 
     def __del__(self):
@@ -110,11 +110,11 @@ class daemon:
         self.addr = None
         self.client = None
 
-    def recvLocalSocket(self):
+    def recvLocalSocket(self, daemon):
         logging.info("Dionaea connected")
         while True:
             try:
-                data = self.conn.recv(256)
+                data = daemon.conn.recv(256)
             except socket.timeout:
                 logging.warning("Timeout reveiving localsocket")
                 continue
@@ -127,16 +127,16 @@ class daemon:
             data = data.decode('utf-8')
             data = data.split(':')
 
-            if data[0] == "MSG" and self.client.state != "offline":
+            if data[0] == "MSG" and daemon.client.state != "offline":
                 logging.debug("Received MSG:%s" % data[1])
-                self.client.send_message(data[1])
+                daemon.client.send_message(data[1])
             elif data[0] == "CONNECT":
                 logging.debug("Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], data[2], data[3], data[4], data[5], data[7]))
-                self.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
-                self.client.connect()
+                daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
+                daemon.client.connect()
             elif data[0] == "DISCONNECT":
-                self.client.close()
-                self.client = None
+                daemon.client.close()
+                daemon.client = None
         return
 
     def closeLocalConnection(self):
