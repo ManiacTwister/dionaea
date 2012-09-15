@@ -102,7 +102,7 @@ class daemon:
         logging.info("Waiting for a connection")
         s.listen(1)
         self.conn, self.addr = s.accept()
-        t = Thread(target=self.recvLocalSocket, args=(self,))
+        t = Thread(target=self.recvLocalSocket, args=(self))
         t.start()
 
     def __del__(self):
