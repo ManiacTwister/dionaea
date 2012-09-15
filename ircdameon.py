@@ -131,7 +131,7 @@ class daemon:
                 logging.debug("Received MSG:%s" % data[1])
                 daemon.client.send_message(data[1])
             elif data[0] == "CONNECT":
-                logging.debug("Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], data[2], data[3], data[4], data[5], data[7]))
+                logging.debug("Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
                 daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
                 daemon.client.connect()
             elif data[0] == "DISCONNECT":
