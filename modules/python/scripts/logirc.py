@@ -79,7 +79,7 @@ class logirc(ihandler):
     self.port = None
     self.password = None
     self.channel = None
-    self.client.quit()
+    self.sendSocket("DISCONNECT")
     self.state = "Offline"
 
   def start(self):
