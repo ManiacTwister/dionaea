@@ -8,9 +8,7 @@ case "$1" in
   start)
     echo "Starting ircdaemon"
     /sbin/start-stop-daemon --start --pidfile $PIDFILE \
-        --user www-data --group www-data \
         -b --make-pidfile \
-        --chuid www-data \
         --exec $DAEMON $ARGS
     ;;
   stop)
@@ -22,9 +20,7 @@ case "$1" in
     /sbin/start-stop-daemon --stop --pidfile $PIDFILE --verbose
     echo "Starting ircdaemon"
     /sbin/start-stop-daemon --start --pidfile $PIDFILE \
-        --user www-data --group www-data \
         -b --make-pidfile \
-        --chuid www-data \
         --exec $DAEMON $ARGS
     ;;
   *)
