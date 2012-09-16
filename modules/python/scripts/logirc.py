@@ -79,7 +79,6 @@ class logirc(ihandler):
     self.port = None
     self.password = None
     self.channel = None
-    self.sendSocket("DISCONNECT")
     self.state = "Offline"
 
   def start(self):
@@ -89,6 +88,7 @@ class logirc(ihandler):
     self.state = "Online"
     logger.info("Logirc: connected to local socket")
   def stop(self):
+    self.sendSocket("DISCONNECT")
     self.state = "Offline"
     self.s.close()
 
