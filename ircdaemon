@@ -1,0 +1,36 @@
+#!/bin/bash
+
+DAEMON=/opt/dionaea/bin/python3.2
+ARGS="/usr/local/src/dionaea/ircdaemon.py"
+PIDFILE=/usr/local/src/dionaea/.ircdaemon.pid
+
+case "$1" in
+  start)
+    echo "Starting ircdaemon"
+    /sbin/start-stop-daemon --start --pidfile $PIDFILE \
+        --user www-data --group www-data \
+        -b --make-pidfile \
+        --chuid www-data \
+        --exec $DAEMON $ARGS
+    ;;
+  stop)
+    echo "Stopping ircdaemon"
+    /sbin/start-stop-daemon --stop --pidfile $PIDFILE --verbose
+    ;;
+  restart)
+    echo "Stopping ircdaemon"
+    /sbin/start-stop-daemon --stop --pidfile $PIDFILE --verbose
+    echo "Starting ircdaemon"
+    /sbin/start-stop-daemon --start --pidfile $PIDFILE \
+        --user www-data --group www-data \
+        -b --make-pidfile \
+        --chuid www-data \
+        --exec $DAEMON $ARGS
+    ;;
+  *)
+    echo "Usage: /etc/init.d/ircdaemon {start|stop|restart}"
+    exit 1
+    ;;
+esac
+
+exit 0
