@@ -66,6 +66,7 @@ class ircclient:
 
     def close(self):
         logging.info("Disconnected from IRC")
+        self.sendSocket("QUIT")
         self.state = "offline"
         self.sock.close()
         return
