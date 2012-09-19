@@ -169,7 +169,7 @@ class daemon:
                 #daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
                 #daemon.client.connect()
                 reactor.connectTCP(str(data[1]), int(data[2]), DionaeaBotFactory(str(data[7]), str(data[5])))
-                reactor.run()
+                reactor.run(installSignalHandlers=0)
             elif data[0] == "DISCONNECT":
                 #daemon.client.close()
                 reactor.stop()
