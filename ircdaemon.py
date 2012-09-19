@@ -168,11 +168,11 @@ class daemon:
                 logging.debug("Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
                 #daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
                 #daemon.client.connect()
-                reactor.connectTCP(str(data[1]), int(data[2]), DionaeaBotFactory(str(data[7]), str(data[5])))
-                reactor.run(installSignalHandlers=0)
+                irct = Thread(target=self.startIrc, args=(data[1], data[2], data[7], data[5],))
+                irct.start()
             elif data[0] == "DISCONNECT":
                 #daemon.client.close()
-                reactor.stop()
+                self.stopIrc()
                 daemon.client = None
         return
 
@@ -180,5 +180,12 @@ class daemon:
         self.conn.close()
         self.conn = None
         self.addr = None
+
+    def startIrc(self, server, port, channel, nickname):
+        reactor.connectTCP(str(server), int(port), DionaeaBotFactory(str(channel), str(nickname)))
+        reactor.run(installSignalHandlers=0)
+
+    def stopIrc(self):
+        reactor.stop()
 
 d = daemon()
