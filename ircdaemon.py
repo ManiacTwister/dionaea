@@ -13,7 +13,6 @@ class ircclient:
     def __init__(self, server, port, realname, ident, nick, password, channel):
         self.server = server
         self.port = port
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         self.realname = realname
         self.ident = ident
@@ -22,6 +21,7 @@ class ircclient:
         self.state = "offline"
 
     def connect(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((socket.gethostbyname(self.server), self.port))
         self.sendSocket("USER %s %s DIONAEA :%s\r\n" % (self.ident, self.server, self.realname))
         self.sendSocket("NICK %s\r\n" % self.nick)
@@ -83,8 +83,10 @@ class ircclient:
         while data.find("\r") == -1:
             chunk = self.sock.recv(256).decode('utf-8')
             if chunk == None:
+                self.close()
                 self.connect()
             elif len(chunk) <= 0:
+                self.close()
                 self.connect()
             else:
                 data += chunk
