@@ -83,8 +83,8 @@ class ircclient:
         while data.find("\r") == -1:
             chunk = self.sock.recv(256).decode('utf-8')
             if chunk == None:
-                return
-            if len(chunk) <= 0:
+                self.connect()
+            elif len(chunk) <= 0:
                 self.connect()
             else:
                 data += chunk
