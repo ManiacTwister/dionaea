@@ -143,6 +143,7 @@ class daemon:
         self.addr = None
         #self.client = None
         self.channel = None
+        self.deffered = None
 
     def recvLocalSocket(self, daemon):
         logging.info("Dionaea connected")
@@ -184,7 +185,7 @@ class daemon:
         self.addr = None
 
     def startIrc(self, server, port, channel, nickname):
-        self.deferred = reactor.connectTCP(str(server), int(port), DionaeaBotFactory(str(channel), str(nickname)))
+        daemon.deferred = reactor.connectTCP(str(server), int(port), DionaeaBotFactory(str(channel), str(nickname)))
         reactor.run(installSignalHandlers=0)
 
     def stopIrc(self):
