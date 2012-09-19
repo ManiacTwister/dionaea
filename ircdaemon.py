@@ -164,7 +164,7 @@ class daemon:
             if data[0] == "MSG":
                 logging.debug("Received MSG:%s" % data[1])
                 #daemon.client.send_message(data[1])
-                DionaeaBot.msg(self.channel, str(data[1]))
+                self.deffered.msg(self.channel, str(data[1]))
             elif data[0] == "CONNECT":
                 logging.debug("Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
                 #daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
@@ -184,7 +184,7 @@ class daemon:
         self.addr = None
 
     def startIrc(self, server, port, channel, nickname):
-        reactor.connectTCP(str(server), int(port), DionaeaBotFactory(str(channel), str(nickname)))
+        self.deferred = reactor.connectTCP(str(server), int(port), DionaeaBotFactory(str(channel), str(nickname)))
         reactor.run(installSignalHandlers=0)
 
     def stopIrc(self):
