@@ -123,7 +123,7 @@ class DionaeaBotFactory(protocol.ClientFactory):
 
 class daemon:
     def __init__(self):
-        self.client = None
+        #self.client = None
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
         try:
@@ -141,7 +141,7 @@ class daemon:
     def __del__(self):
         self.conn = None
         self.addr = None
-        self.client = None
+        #self.client = None
 
     def recvLocalSocket(self, daemon):
         logging.info("Dionaea connected")
@@ -160,7 +160,7 @@ class daemon:
             data = data.decode('utf-8')
             data = data.split(':')
 
-            if data[0] == "MSG" and daemon.client.state != "offline":
+            if data[0] == "MSG":
                 logging.debug("Received MSG:%s" % data[1])
                 #daemon.client.send_message(data[1])
                 DionaeaBot.msg(DionaeaBot.factory.channel, str(data[1]))
@@ -173,7 +173,7 @@ class daemon:
             elif data[0] == "DISCONNECT":
                 #daemon.client.close()
                 self.stopIrc()
-                daemon.client = None
+                #daemon.client = None
         return
 
     def closeLocalConnection(self):
