@@ -142,6 +142,7 @@ class daemon:
         self.conn = None
         self.addr = None
         #self.client = None
+        self.channel = None
 
     def recvLocalSocket(self, daemon):
         logging.info("Dionaea connected")
@@ -163,11 +164,12 @@ class daemon:
             if data[0] == "MSG":
                 logging.debug("Received MSG:%s" % data[1])
                 #daemon.client.send_message(data[1])
-                DionaeaBot.msg(DionaeaBot.factory.channel, str(data[1]))
+                DionaeaBot.msg(self.channel, str(data[1]))
             elif data[0] == "CONNECT":
                 logging.debug("Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
                 #daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
                 #daemon.client.connect()
+                self.channel = data[7]
                 irct = Thread(target=self.startIrc, args=(data[1], data[2], data[7], data[5],))
                 irct.start()
             elif data[0] == "DISCONNECT":
