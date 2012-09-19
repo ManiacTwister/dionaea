@@ -2,16 +2,11 @@ import socket
 import os
 from threading import Thread
 import logging
-import sys
-import re
-import urllib
 
-from twisted.words.protocols import irc
-from twisted.internet import protocol, reactor
 
-#logging.basicConfig(filename='irclog.log', level=logging.DEBUG)
+logging.basicConfig(filename='irclog.log', level=logging.DEBUG)
 
-''' IRC Client begin
+''' IRC Client begin '''
 
 
 class ircclient:
@@ -33,8 +28,8 @@ class ircclient:
         self.sendSocket("JOIN %s\r\n" % self.channel)
         self.state = "online"
         logging.info("Connected to IRC")
-        t = Thread(target=self.server_response, args=(self,))
-        t.start()
+        self.t = Thread(target=self.server_response, args=(self,))
+        self.t.start()
 
     def parseMessage(self, message):
         nick = message[message.index(":"):message.index("!")]
@@ -53,8 +48,10 @@ class ircclient:
                 if len(response) == 0:
                     client.connect()
                     return
+                '''if "!" in response and ":" in response[response.index(":") + 1:]:
+                    return client.parseMessage(response)'''
                 if "PING :" in response:
-                    #client.sendSocket(response.replace("PING", "PONG"))
+                    client.sendSocket(response.replace("PING", "PONG"))
                     logging.debug("Received PING")
             except KeyboardInterrupt:
                 break
@@ -87,43 +84,18 @@ class ircclient:
             chunk = self.sock.recv(256).decode('utf-8')
             if chunk == None:
                 return
+            if len(chunk) <= 0:
+                self.connect()
             else:
                 data += chunk
         return data
 
-IRC Client end '''
-
-class DionaeaBot(irc.IRCClient):
-    def _get_nickname(self):
-        return self.factory.nickname
-    nickname = property(_get_nickname)
-
-    def signedOn(self):
-        self.join(self.factory.channel)
-        print "Signed on as %s." % (self.nickname)
-
-    def joined(self, channel):
-        print "Joined %s." % channel
-
-
-class DionaeaBotFactory(protocol.ClientFactory):
-    protocol = DionaeaBot
-
-    def __init__(self, channel, nickname):
-        self.channel = channel
-        self.nickname = nickname
-
-    def clientConnectionLost(self, connector, reason):
-        print "Lost connection (%s), reconnecting." % reason
-        connector.connect()
-
-    def clientConnectionFailed(self, connector, reason):
-        print "Could not connect: %s" % reason
+''' IRC Client end '''
 
 
 class daemon:
     def __init__(self):
-        #self.client = None
+        self.client = None
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
         try:
@@ -141,9 +113,7 @@ class daemon:
     def __del__(self):
         self.conn = None
         self.addr = None
-        #self.client = None
-        self.channel = None
-        self.deffered = None
+        self.client = None
 
     def recvLocalSocket(self, daemon):
         logging.info("Dionaea connected")
@@ -162,33 +132,21 @@ class daemon:
             data = data.decode('utf-8')
             data = data.split(':')
 
-            if data[0] == "MSG":
+            if data[0] == "MSG" and daemon.client.state != "offline":
                 logging.debug("Received MSG:%s" % data[1])
-                #daemon.client.send_message(data[1])
-                daemon.deffered.msg(self.channel, str(data[1]))
+                daemon.client.send_message(data[1])
             elif data[0] == "CONNECT":
                 logging.debug("Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
-                #daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
-                #daemon.client.connect()
-                self.channel = data[7]
-                irct = Thread(target=self.startIrc, args=(data[1], data[2], data[7], data[5],))
-                irct.start()
+                daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
+                daemon.client.connect()
             elif data[0] == "DISCONNECT":
-                #daemon.client.close()
-                self.stopIrc()
-                #daemon.client = None
+                daemon.client.close()
+                daemon.client = None
         return
 
     def closeLocalConnection(self):
         self.conn.close()
         self.conn = None
         self.addr = None
-
-    def startIrc(self, server, port, channel, nickname):
-        daemon.deferred = reactor.connectTCP(str(server), int(port), DionaeaBotFactory(str(channel), str(nickname)))
-        reactor.run(installSignalHandlers=0)
-
-    def stopIrc(self):
-        reactor.stop()
 
 d = daemon()
