@@ -163,12 +163,12 @@ class daemon:
             if data[0] == "MSG" and daemon.client.state != "offline":
                 logging.debug("Received MSG:%s" % data[1])
                 #daemon.client.send_message(data[1])
-                DionaeaBot.msg(DionaeaBot.factory.channel, data[1])
+                DionaeaBot.msg(DionaeaBot.factory.channel, str(data[1]))
             elif data[0] == "CONNECT":
                 logging.debug("Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
                 #daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
                 #daemon.client.connect()
-                reactor.connectTCP(data[1], int(data[2]), DionaeaBotFactory(data[7], data[5]))
+                reactor.connectTCP(str(data[1]), int(data[2]), DionaeaBotFactory(str(data[7]), str(data[5])))
                 reactor.run()
             elif data[0] == "DISCONNECT":
                 #daemon.client.close()
