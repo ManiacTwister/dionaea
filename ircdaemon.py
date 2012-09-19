@@ -51,7 +51,7 @@ class ircclient:
                 '''if "!" in response and ":" in response[response.index(":") + 1:]:
                     return client.parseMessage(response)'''
                 if "PING :" in response:
-                    client.sendSocket(response.replace("PING", "PONG"))
+                    #client.sendSocket(response.replace("PING", "PONG"))
                     logging.debug("Received PING")
             except KeyboardInterrupt:
                 break
