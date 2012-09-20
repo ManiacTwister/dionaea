@@ -95,11 +95,10 @@ class ircclient:
         return
 
     def sendSocket(self, data):
-        data = bytearray(data, 'utf-8')
         if self.ssl:
             self.ssl.write(data)
         else:
-            self.sock.send(data)
+            self.sock.send(bytearray(data, 'utf-8'))
         return
 
     def recvSocket(self):
