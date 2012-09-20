@@ -3,6 +3,7 @@ import os
 from threading import Thread
 import logging
 import errno
+from time import sleep
 
 logging.basicConfig(filename='irclog.log', level=logging.DEBUG)
 
@@ -22,22 +23,27 @@ class ircclient:
 
     def connect(self):
         try:
+            logging.log("[IRC] Connection to ircserver")
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((socket.gethostbyname(self.server), self.port))
+            logging.info("[IRC] Connected to IRC")
             self.sendSocket("USER %s %s DIONAEA :%s\r\n" % (self.ident, self.server, self.realname))
             self.sendSocket("NICK %s\r\n" % self.nick)
             self.sendSocket("JOIN %s\r\n" % self.channel)
             self.state = "online"
-            logging.info("Connected to IRC")
+            logging.info("[IRC] Joined channel")
             self.t = Thread(target=self.server_response, args=(self,))
             self.t.start()
         except socket.error, v:
             if v[0] == errno.ECONNREFUSED:
-                logging.warning("Connection refused, retrying")
+                logging.warning("[IRC] Connection refused, retrying in 5 seconds")
             else:
-                logging.warning("Connection failed, retrying")
+                logging.warning("[IRC] Connection failed, retrying in 5 seconds")
+            sleep(5)
             self.connect()
         except:
+            logging.warning("[IRC] Connection failed, retrying in 5 seconds")
+            sleep(5)
             self.connect()
 
     def parseMessage(self, message):
@@ -61,23 +67,23 @@ class ircclient:
                     return client.parseMessage(response)'''
                 if "PING :" in response:
                     client.sendSocket(response.replace("PING", "PONG"))
-                    logging.debug("Received PING")
+                    logging.debug("[IRC] Received PING")
             except KeyboardInterrupt:
                 break
         return
 
     def send_message(self, message):
         if not message:
-            logging.warning("Executed send_message without a message")
+            logging.warning("[IRC] Executed send_message without a message")
             return
         if self.channel:
             return self.sendSocket("PRIVMSG %s :%s\r\n" % (self.channel, message))
         else:
-            logging.warning("Executed send_message without a defined channel")
+            logging.warning("[IRC] Executed send_message without a defined channel")
             return False
 
     def close(self):
-        logging.info("Disconnected from IRC")
+        logging.info("[IRC] Disconnected from IRC")
         self.sendSocket("QUIT")
         self.state = "offline"
         self.sock.close()
@@ -115,7 +121,7 @@ class daemon:
             pass
 
         s.bind("/tmp/ircdaemon")
-        logging.info("Waiting for a connection")
+        logging.info("[LOCAL] Waiting for a connection")
         s.listen(1)
         self.conn, self.addr = s.accept()
         t = Thread(target=self.recvLocalSocket, args=(self,))
@@ -127,12 +133,12 @@ class daemon:
         self.client = None
 
     def recvLocalSocket(self, daemon):
-        logging.info("Dionaea connected")
+        logging.info("[LOCAL] Dionaea connected")
         while True:
             try:
                 data = daemon.conn.recv(256)
             except socket.timeout:
-                logging.warning("Timeout reveiving localsocket")
+                logging.warning("[LOCAL] Timeout reveiving localsocket")
                 continue
             except KeyboardInterrupt:
                 break
@@ -144,13 +150,14 @@ class daemon:
             data = data.split(':')
 
             if data[0] == "MSG" and daemon.client.state != "offline":
-                logging.debug("Received MSG:%s" % data[1])
+                logging.debug("[LOCAL] Received MSG:%s" % data[1])
                 daemon.client.send_message(data[1])
             elif data[0] == "CONNECT":
-                logging.debug("Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
+                logging.debug("[LOCAL] Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
                 daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
                 daemon.client.connect()
             elif data[0] == "DISCONNECT":
+                logging.debug("[LOCAL] Received DISCONNECT")
                 daemon.client.close()
                 daemon.client = None
         return
