@@ -30,7 +30,7 @@ class ircclient:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((socket.gethostbyname(self.server), self.port))
             if self.ssl:
-                self.ssl = ssl_mod.wrap_socket(self.socket)
+                self.ssl = ssl_mod.wrap_socket(self.sock)
             logging.info("[IRC] Connected to IRC")
             self.sendSocket("USER %s %s DIONAEA :%s\r\n" % (self.ident, self.server, self.realname))
             self.sendSocket("NICK %s\r\n" % self.nick)
