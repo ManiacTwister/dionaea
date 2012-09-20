@@ -22,8 +22,8 @@ class ircclient:
         self.state = "offline"
 
     def connect(self):
+        logging.log("[IRC] Connecting to IRC")
         try:
-            logging.log("[IRC] Connection to ircserver")
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((socket.gethostbyname(self.server), self.port))
             logging.info("[IRC] Connected to IRC")
