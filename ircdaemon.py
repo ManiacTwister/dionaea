@@ -106,9 +106,9 @@ class ircclient:
         data = str()
         while data.find("\r") == -1:
             if self.ssl:
-                chunk = self.ssl.read(256)
+                chunk = self.ssl.read()
             else:
-                chunk = self.sock.recv(256)
+                chunk = self.sock.recv(4096)
 
             chunk = chunk.decode('utf-8')
 
@@ -151,7 +151,7 @@ class daemon:
         logging.info("[LOCAL] Dionaea connected")
         while True:
             try:
-                data = daemon.conn.recv(256)
+                data = daemon.conn.recv(4096)
             except socket.timeout:
                 logging.warning("[LOCAL] Timeout reveiving localsocket")
                 continue
