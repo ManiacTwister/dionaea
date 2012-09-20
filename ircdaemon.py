@@ -5,7 +5,8 @@ import logging
 import errno
 from time import sleep
 
-logging.basicConfig(filename='irclog.log', level=logging.DEBUG)
+logging.basicConfig(filename='irclog.log', format='%(asctime)s;%(levelname)s;%(message)s', level=logging.DEBUG)
+
 
 ''' IRC Client begin '''
 
