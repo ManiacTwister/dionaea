@@ -43,11 +43,11 @@ class ircclient:
             if v[0] == errno.ECONNREFUSED:
                 logging.warning("[IRC] Connection refused, retrying in 5 seconds")
             else:
-                logging.warning("[IRC] Connection failed, retrying in 5 seconds")
+                logging.warning("[IRC] Connection failed, retrying in 5 seconds: %s" % v)
             sleep(5)
             self.connect()
         except:
-            logging.warning("[IRC] Connection failed, retrying in 5 seconds")
+            logging.warning("[IRC] Connection failed, retrying in 5 seconds: %s" % v)
             sleep(5)
             self.connect()
 
