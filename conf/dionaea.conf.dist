@@ -417,6 +417,7 @@ modules = {
 			password = "anonymous"
 			realname = "Honeypot"
 			ident = "Honeypot"
+			ssl = "false"
 		}
 		nfq = {
 			/** 

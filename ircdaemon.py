@@ -4,6 +4,7 @@ from threading import Thread
 import logging
 import errno
 from time import sleep
+import ssl as ssl_mod
 
 logging.basicConfig(filename='irclog.log', format='%(asctime)s;%(levelname)s;%(message)s', level=logging.DEBUG)
 
@@ -12,7 +13,7 @@ logging.basicConfig(filename='irclog.log', format='%(asctime)s;%(levelname)s;%(m
 
 
 class ircclient:
-    def __init__(self, server, port, realname, ident, nick, password, channel):
+    def __init__(self, server, port, realname, ident, nick, password, channel, ssl):
         self.server = server
         self.port = port
 
@@ -21,12 +22,15 @@ class ircclient:
         self.nick = nick
         self.channel = channel
         self.state = "offline"
+        self.ssl = ssl
 
     def connect(self):
         logging.info("[IRC] Connecting to IRC")
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((socket.gethostbyname(self.server), self.port))
+            if self.ssl:
+                self.ssl = ssl_mod.wrap_socket(self.socket)
             logging.info("[IRC] Connected to IRC")
             self.sendSocket("USER %s %s DIONAEA :%s\r\n" % (self.ident, self.server, self.realname))
             self.sendSocket("NICK %s\r\n" % self.nick)
@@ -91,13 +95,23 @@ class ircclient:
         return
 
     def sendSocket(self, data):
-        self.sock.send(bytearray(data, 'utf-8'))
+        data = bytearray(data, 'utf-8')
+        if self.ssl:
+            self.ssl.write(data)
+        else:
+            self.sock.send(data)
         return
 
     def recvSocket(self):
         data = str()
         while data.find("\r") == -1:
-            chunk = self.sock.recv(256).decode('utf-8')
+            if self.ssl:
+                chunk = self.ssl.read(256)
+            else:
+                chunk = self.sock.recv(256)
+
+            chunk = chunk.decode('utf-8')
+
             if chunk == None:
                 self.close()
                 self.connect()
@@ -155,7 +169,7 @@ class daemon:
                 daemon.client.send_message(data[1])
             elif data[0] == "CONNECT":
                 logging.debug("[LOCAL] Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
-                daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7])
+                daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7], ssl=bool(data[8]))
                 daemon.client.connect()
             elif data[0] == "DISCONNECT":
                 logging.debug("[LOCAL] Received DISCONNECT")
