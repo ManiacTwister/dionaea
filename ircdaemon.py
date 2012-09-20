@@ -2,7 +2,7 @@ import socket
 import os
 from threading import Thread
 import logging
-
+import errno
 
 logging.basicConfig(filename='irclog.log', level=logging.DEBUG)
 
@@ -21,15 +21,24 @@ class ircclient:
         self.state = "offline"
 
     def connect(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((socket.gethostbyname(self.server), self.port))
-        self.sendSocket("USER %s %s DIONAEA :%s\r\n" % (self.ident, self.server, self.realname))
-        self.sendSocket("NICK %s\r\n" % self.nick)
-        self.sendSocket("JOIN %s\r\n" % self.channel)
-        self.state = "online"
-        logging.info("Connected to IRC")
-        self.t = Thread(target=self.server_response, args=(self,))
-        self.t.start()
+        try:
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.connect((socket.gethostbyname(self.server), self.port))
+            self.sendSocket("USER %s %s DIONAEA :%s\r\n" % (self.ident, self.server, self.realname))
+            self.sendSocket("NICK %s\r\n" % self.nick)
+            self.sendSocket("JOIN %s\r\n" % self.channel)
+            self.state = "online"
+            logging.info("Connected to IRC")
+            self.t = Thread(target=self.server_response, args=(self,))
+            self.t.start()
+        except socket.error, v:
+            if v[0] == errno.ECONNREFUSED:
+                logging.warning("Connection refused, retrying")
+            else:
+                logging.warning("Connection failed, retrying")
+            self.connect()
+        except:
+            self.connect()
 
     def parseMessage(self, message):
         nick = message[message.index(":"):message.index("!")]
