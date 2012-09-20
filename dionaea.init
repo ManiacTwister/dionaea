@@ -1,0 +1,53 @@
+#!/bin/sh -e
+### BEGIN INIT INFO
+# Provides:          dionaea
+# Required-Start:    $syslog ircdaemon
+# Required-Stop:     $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start dionaea at boot time
+# Description:       Dionaea intention is to trap malware exploiting vulnerabilities exposed by services offerd to a network, the ultimate goal is gaining a copy of the malware.
+### END INIT INFO
+
+PIDFILE=/var/run/dionaea.pid
+DAEMON=/opt/dionaea/bin/dionaea
+DESC="Dionaea"
+ROOTDIR=/opt/dionaea/
+test -x $DAEMON || exit 0
+test -d $ROOTDIR || exit 0
+
+case $1 in
+start)
+  echo -n "Starting $DESC: "
+  if [ -e $PIDFILE ]; then 
+    echo "already running, please stop first"
+    exit 1
+  fi
+  cd $ROOTDIR
+  STATUS="OK"
+  $DAEMON -D -l warning -L '*' -p $PIDFILE > /dev/null || STATUS="FAILED"
+  echo "$STATUS"
+  ;;
+stop)
+  echo -n "Stopping $DESC: "
+  if [ -e $PIDFILE ]; then
+    neppid=`cat $PIDFILE`
+    `kill -9 $neppid`;
+    rm $PIDFILE
+    echo "OK" 
+  else 
+    echo "failed: no pid found"
+  fi
+  ;;
+restart)
+  shift
+  $0 stop ${@}
+  sleep 1
+  $0 start ${0}
+  ;;
+*)
+  echo "Usage: $0 {start|stop|restart}" >&2
+  exit 1
+  ;;
+esac
+exit 0
