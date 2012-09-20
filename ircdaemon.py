@@ -46,7 +46,7 @@ class ircclient:
                 logging.warning("[IRC] Connection failed, retrying in 5 seconds: %s" % v)
             sleep(5)
             self.connect()
-        except:
+        except Exception, v:
             logging.warning("[IRC] Connection failed, retrying in 5 seconds: %s" % v)
             sleep(5)
             self.connect()
