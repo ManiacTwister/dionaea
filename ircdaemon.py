@@ -29,6 +29,7 @@ class ircclient:
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((socket.gethostbyname(self.server), self.port))
+            self.sock.settimeout(120)
             if self.ssl:
                 self.ssl = ssl_mod.wrap_socket(self.sock)
             logging.info("[IRC] Connected to IRC")
@@ -104,22 +105,27 @@ class ircclient:
 
     def recvSocket(self):
         data = str()
-        while data.find("\r") == -1:
-            if self.ssl:
-                chunk = self.ssl.read()
-            else:
-                chunk = self.sock.recv(4096)
+        try:
+            while data.find("\r") == -1:
+                if self.ssl:
+                    chunk = self.ssl.read()
+                else:
+                    chunk = self.sock.recv(4096)
 
-            chunk = chunk.decode('utf-8')
+                chunk = chunk.decode('utf-8')
 
-            if chunk == None:
-                self.close()
-                self.connect()
-            elif len(chunk) <= 0:
-                self.close()
-                self.connect()
-            else:
-                data += chunk
+                if chunk == None:
+                    self.close()
+                    self.connect()
+                elif len(chunk) <= 0:
+                    self.close()
+                    self.connect()
+                else:
+                    data += chunk
+        except Exception as v:
+            logging.warning("[IRC] Receiving failed, reconnection in 5 seconds: %s" % v)
+            sleep(5)
+            self.connect()
         return data
 
 ''' IRC Client end '''
