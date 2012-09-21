@@ -126,7 +126,7 @@ class ircclient:
         except Exception as v:
             errno, errstr = sys.exc_info()[:2]
             if errno == socket.timeout or errstr == 'The read operation timed out':
-                continue
+                return data
             else:
                 logging.warning("[IRC] Receiving failed, reconnection in 5 seconds: %s" % v)
                 sleep(5)
