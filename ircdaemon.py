@@ -104,31 +104,22 @@ class ircclient:
 
     def recvSocket(self):
         data = str()
-        try:
-            while data.find("\r") == -1:
-                if self.ssl:
-                    chunk = self.ssl.read()
-                else:
-                    chunk = self.sock.recv(4096)
-
-                chunk = chunk.decode('utf-8')
-
-                if chunk == None:
-                    self.close()
-                    self.connect()
-                elif len(chunk) <= 0:
-                    self.close()
-                    self.connect()
-                else:
-                    data += chunk
-        '''except Exception as v:
-            errno, errstr = sys.exc_info()[:2]
-            if errno == socket.timeout or errstr == 'The read operation timed out':
-                return data
+        while data.find("\r") == -1:
+            if self.ssl:
+                chunk = self.ssl.read()
             else:
-                logging.warning("[IRC] Receiving failed, reconnection in 5 seconds: %s" % v)
-                sleep(5)
-                self.connect()'''
+                chunk = self.sock.recv(4096)
+
+            chunk = chunk.decode('utf-8')
+
+            if chunk == None:
+                self.close()
+                self.connect()
+            elif len(chunk) <= 0:
+                self.close()
+                self.connect()
+            else:
+                data += chunk
         return data
 
 ''' IRC Client end '''
