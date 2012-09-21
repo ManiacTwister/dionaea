@@ -5,7 +5,6 @@ import logging
 import errno
 from time import sleep
 import ssl as ssl_mod
-import sys
 
 logging.basicConfig(filename='irclog.log', format='%(asctime)s;%(levelname)s;%(message)s', level=logging.DEBUG)
 
@@ -24,6 +23,18 @@ class ircclient:
         self.channel = channel
         self.state = "offline"
         self.ssl = ssl
+        #light red
+        #purple
+        #pink
+        #light green
+        #dark grey
+        self.colors = {
+            'crit': "\x03\x34",
+            'warn': "\x03\x36",
+            'debug': "\x03\x31\x33",
+            'info': "\x03\x39",
+            'spam': "\x03\x31\x34"
+        }
 
     def connect(self):
         logging.info("[IRC] Connecting to IRC")
@@ -77,12 +88,12 @@ class ircclient:
                 break
         return
 
-    def send_message(self, message):
+    def send_message(self, message, type="info"):
         if not message:
             logging.warning("[IRC] Executed send_message without a message")
             return
         if self.channel:
-            return self.sendSocket("PRIVMSG %s :%s\r\n" % (self.channel, message))
+            return self.sendSocket("PRIVMSG %s :%s%s\r\n" % (self.channel, self.colors[type], message))
         else:
             logging.warning("[IRC] Executed send_message without a defined channel")
             return False
@@ -166,7 +177,10 @@ class daemon:
 
             if data[0] == "MSG" and daemon.client.state != "offline":
                 logging.debug("[LOCAL] Received MSG:%s" % data[1])
-                daemon.client.send_message(data[1])
+                if len(data) >= 3:
+                    daemon.client.send_message(data[2], data[1])
+                else:
+                    daemon.client.send_message(data[1])
             elif data[0] == "CONNECT":
                 logging.debug("[LOCAL] Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
                 daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7], ssl=bool(data[8]))

@@ -169,7 +169,7 @@ class logirc(ihandler):
    return "profile ref %s: %s" % (i.profile, i.con.__hash__())
 
   def serialize_incident_dionaea_download_offer(self, i, anonymous):
-    return "offer ref %i: %s" % (i.con.__hash__(), i.url)
+    return "warn:s:offer ref %i: %s" % (i.con.__hash__(), i.url)
 
   def serialize_incident_dionaea_download_complete_hash(self, i, anonymous):
     # do not announce files gatherd via irc
