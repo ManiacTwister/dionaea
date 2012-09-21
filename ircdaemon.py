@@ -5,6 +5,7 @@ import logging
 import errno
 from time import sleep
 import ssl as ssl_mod
+import sys
 
 logging.basicConfig(filename='irclog.log', format='%(asctime)s;%(levelname)s;%(message)s', level=logging.DEBUG)
 
@@ -123,9 +124,13 @@ class ircclient:
                 else:
                     data += chunk
         except Exception as v:
-            logging.warning("[IRC] Receiving failed, reconnection in 5 seconds: %s" % v)
-            sleep(5)
-            self.connect()
+            errno, errstr = sys.exc_info()[:2]
+            if errno == socket.timeout or errstr == 'The read operation timed out':
+                continue
+            else:
+                logging.warning("[IRC] Receiving failed, reconnection in 5 seconds: %s" % v)
+                sleep(5)
+                self.connect()
         return data
 
 ''' IRC Client end '''
