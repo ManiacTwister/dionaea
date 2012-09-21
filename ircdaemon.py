@@ -162,7 +162,7 @@ class daemon:
                 continue
 
             data = data.decode('utf-8')
-            data = data.split(':')
+            data = data.split(':s:')
 
             if data[0] == "MSG" and daemon.client.state != "offline":
                 logging.debug("[LOCAL] Received MSG:%s" % data[1])
