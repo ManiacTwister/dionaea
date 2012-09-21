@@ -30,7 +30,7 @@ class ircclient:
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((socket.gethostbyname(self.server), self.port))
-            self.sock.settimeout(120)
+            #self.sock.settimeout(120)
             if self.ssl:
                 self.ssl = ssl_mod.wrap_socket(self.sock)
             logging.info("[IRC] Connected to IRC")
@@ -121,14 +121,14 @@ class ircclient:
                     self.connect()
                 else:
                     data += chunk
-        except Exception as v:
+        '''except Exception as v:
             errno, errstr = sys.exc_info()[:2]
             if errno == socket.timeout or errstr == 'The read operation timed out':
                 return data
             else:
                 logging.warning("[IRC] Receiving failed, reconnection in 5 seconds: %s" % v)
                 sleep(5)
-                self.connect()
+                self.connect()'''
         return data
 
 ''' IRC Client end '''
