@@ -13,13 +13,14 @@
 DAEMON=/opt/dionaea/bin/python3.2
 ARGS="/usr/local/src/dionaea/ircdaemon.py"
 PIDFILE=/usr/local/src/dionaea/.ircdaemon.pid
+OPTIONS=" 1>/dev/null 2>/var/log/ircdaemon.errors"
 
 case "$1" in
   start)
     echo "Starting ircdaemon"
     /sbin/start-stop-daemon --start --pidfile $PIDFILE \
         -b --make-pidfile \
-        --exec $DAEMON $ARGS
+        --exec $DAEMON $ARGS -- $OPTIONS
     ;;
   stop)
     echo "Stopping ircdaemon"
@@ -31,7 +32,7 @@ case "$1" in
     echo "Starting ircdaemon"
     /sbin/start-stop-daemon --start --pidfile $PIDFILE \
         -b --make-pidfile \
-        --exec $DAEMON $ARGS
+        --exec $DAEMON $ARGS -- $OPTIONS
     ;;
   *)
     echo "Usage: /etc/init.d/ircdaemon {start|stop|restart}"
