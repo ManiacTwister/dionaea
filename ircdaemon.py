@@ -85,7 +85,8 @@ class ircclient:
                     client.sendSocket(response.replace("PING", "PONG"))
                     logging.debug("[IRC] Received PING")
             except KeyboardInterrupt:
-                break
+                #break
+                pass
         return
 
     def send_message(self, message, type="info"):
@@ -98,9 +99,9 @@ class ircclient:
             logging.warning("[IRC] Executed send_message without a defined channel")
             return False
 
-    def close(self):
+    def close(self, msg=""):
         logging.info("[IRC] Disconnected from IRC")
-        self.sendSocket("QUIT")
+        self.sendSocket("QUIT :%s" % msg)
         self.state = "offline"
         self.sock.close()
         return
@@ -167,7 +168,8 @@ class daemon:
                 logging.warning("[LOCAL] Timeout reveiving localsocket")
                 continue
             except KeyboardInterrupt:
-                break
+                #break
+                pass
 
             if not data:
                 continue
@@ -187,7 +189,7 @@ class daemon:
                 daemon.client.connect()
             elif data[0] == "DISCONNECT":
                 logging.debug("[LOCAL] Received DISCONNECT")
-                daemon.client.close()
+                daemon.client.close("Dionaea requested disconnect")
                 daemon.client = None
         return
 
