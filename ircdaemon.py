@@ -53,7 +53,7 @@ class ircclient:
             self.t = Thread(target=self.server_response, args=(self,))
             self.t.start()
         except socket.error as v:
-            if v[0] == errno.ECONNREFUSED:
+            if v.errno == errno.ECONNREFUSED:
                 logging.warning("[IRC] Connection refused, retrying in 5 seconds")
             else:
                 logging.warning("[IRC] Connection failed, retrying in 5 seconds: %s" % v)
