@@ -132,9 +132,11 @@ class ircclient:
 
             if chunk == None:
                 self.close()
+                sleep(5)
                 self.connect()
             elif len(chunk) <= 0:
                 self.close()
+                sleep(5)
                 self.connect()
             else:
                 data += chunk
