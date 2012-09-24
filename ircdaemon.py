@@ -113,8 +113,8 @@ class ircclient:
                 self.ssl.write(data)
             else:
                 self.sock.send(data)
-        except:
-            pass
+        except Exception as e:
+            logging.warn("[IRC] Error sending to socket: %s" % e)
         return
 
     def recvSocket(self):
