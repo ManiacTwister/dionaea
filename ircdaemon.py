@@ -107,21 +107,26 @@ class ircclient:
         return
 
     def sendSocket(self, data):
-        data = bytearray(data, 'utf-8')
-        if self.ssl:
-            self.ssl.write(data)
-        else:
-            self.sock.send(data)
+        try:
+            data = bytearray(data, 'utf-8')
+            if self.ssl:
+                self.ssl.write(data)
+            else:
+                self.sock.send(data)
+        except:
+            pass
         return
 
     def recvSocket(self):
         data = str()
         while data.find("\r") == -1:
-            if self.ssl:
-                chunk = self.ssl.read()
-            else:
-                chunk = self.sock.recv(4096)
-
+            try:
+                if self.ssl:
+                    chunk = self.ssl.read()
+                else:
+                    chunk = self.sock.recv(4096)
+            except:
+                pass
             chunk = chunk.decode('utf-8')
 
             if chunk == None:
