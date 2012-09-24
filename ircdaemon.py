@@ -120,14 +120,15 @@ class ircclient:
     def recvSocket(self):
         data = str()
         while data.find("\r") == -1:
+            chunk = str()
             try:
                 if self.ssl:
                     chunk = self.ssl.read()
                 else:
                     chunk = self.sock.recv(4096)
+                chunk = chunk.decode('utf-8')
             except:
                 pass
-            chunk = chunk.decode('utf-8')
 
             if chunk == None:
                 self.close()
