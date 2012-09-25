@@ -23,8 +23,9 @@ class ircclient:
         self.channel = channel
         self.state = "offline"
         self.ssl = ssl
-        self.adminpw = adminpw
         self.adminhost = adminhost
+        self.adminpw = adminpw
+
         #light red
         #purple
         #pink
@@ -90,7 +91,7 @@ class ircclient:
             logging.debug("[IRC] Received command: %s %s %s %s" % (nick, host.replace("~", ""), dest, cmd[0]))
             if len(cmd) >= 1:
                 if "!opme" in cmd[0] and len(cmd) >= 2:
-                    logging.debug("[IRC] Received command !opme from %s with pw %s and %s and %s" % (nick, cmd[1], self.adminpw, self.adminhost))
+                    logging.debug("[IRC] Received command !opme from %s with pw %s and host %s and pw %s" % (nick, cmd[1], self.adminhost, self.adminpw))
                     if cmd[1] == self.adminpw and host.replace("~", "") == self.adminhost:
                         self.sendSocket("MODE %s +o %s" % (dest, nick))
                         logging.debug("[IRC] Opped %s" % nick)
