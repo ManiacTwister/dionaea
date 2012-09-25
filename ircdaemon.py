@@ -69,6 +69,7 @@ class ircclient:
 
     def parseMessage(self, s):
         try:
+            s = s.rstrip()
             """Breaks a message from an IRC server into its prefix, command, and arguments.
             """
             prefix = ''
