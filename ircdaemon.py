@@ -83,8 +83,9 @@ class ircclient:
             else:
                 args = s.split()
             command = args.pop(0)
+            nick, host = prefix.split("!")
 
-            logging.debug("[IRC] Received command: %s %s %s" % (prefix, command, args))
+            logging.debug("[IRC] Received command: %s %s %s %s" % (nick, host, command, args))
             '''if len(args) >= 1:
                 if "!opme" in args[0] and len(args) >= 2:
                     logging.debug("[IRC] Received command !opme from %s" % nick)
