@@ -72,13 +72,14 @@ class ircclient:
 
     def server_response(self, client):
         #i = 0
-        while(client.state != "offline"):
+        while(client.state != "offline" and self.state != "offline"):
             try:
                 #i = i + 1
                 #logger.debug("PRIVMSG %s :%s" % (client.channel, i))
                 #client.sendSocket("PRIVMSG %s :%s\r\n" % (client.channel, i))
                 response = self.recvSocket()
-
+                if len(response) <= 0:
+                    return
                 '''if "!" in response and ":" in response[response.index(":") + 1:]:
                     return client.parseMessage(response)'''
                 if "PING :" in response:
