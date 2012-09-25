@@ -68,19 +68,29 @@ class ircclient:
 
     def parseMessage(self, s):
         try:
-            #message = ':'.join(s.split(':')[2:])
-            nick = s.split('!')[0].replace(':', ' ')
-            host = nick = s.split('!')[1].replace('~', '')
-            destination = ''.join(s.split(':')[:2]).split(' ')[-2]
-            args = s.split()
+            """Breaks a message from an IRC server into its prefix, command, and arguments.
+            """
+            prefix = ''
+            trailing = []
+            if not s:
+                return
+            if s[0] == ':':
+                prefix, s = s[1:].split(' ', 1)
+            if s.find(' :') != -1:
+                s, trailing = s.split(' :', 1)
+                args = s.split()
+                args.append(trailing)
+            else:
+                args = s.split()
+            command = args.pop(0)
 
-            logging.debug("[IRC] Received command: %s %s %s %s" % (nick, host, destination, args))
-            if len(args) >= 1:
+            logging.debug("[IRC] Received command: %s %s %s" % (prefix, command, args))
+            '''if len(args) >= 1:
                 if "!opme" in args[0] and len(args) >= 2:
                     logging.debug("[IRC] Received command !opme from %s" % nick)
                     if args[1] == self.adminpw and host == ("~%s" % self.adminhost):
                         self.sendSocket("MODE %s +o %s" % (destination, nick))
-                        logging.debug("[IRC] Opped %s" % nick)
+                        logging.debug("[IRC] Opped %s" % nick)'''
         except:
             return
 
