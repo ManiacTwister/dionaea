@@ -67,28 +67,19 @@ class ircclient:
             self.connect()
 
     def parseMessage(self, s):
-        prefix = ''
-        trailing = []
-        if not s:
-            return
-        if s[0] == ':':
-            prefix, s = s[1:].split(' ', 1)
-        if s.find(' :') != -1:
-            s, trailing = s.split(' :', 1)
-            args = s.split()
-            args.append(trailing)
-        else:
-            args = s.split()
-        command = args.pop(0)
+        nick = s.split(":")[1].split("!")[0]
+        user = s.split("!")[1].split("@")[0]
+        host = s.split(" ")[0].split("@")[1]
+        args = s.split(" ")[2]
 
-        logging.debug("[IRC] Received command: %s %s %s" % (args[0], args[1], prefix))
-        if "!opme" in args[1]:
-            nick, host = prefix.split("!", 1)
-            command, cmdargs = prefix.split(" ", 1)
-            logging.debug("[IRC] Received command !opme from %s" % nick)
-            if cmdargs == self.adminpw and host == ("~%s" % self.adminhost):
-                self.sendSocket("MODE %s +o %s" % (args[0], nick))
-                logging.debug("[IRC] Opped %s" % nick)
+        logging.debug("[IRC] Received command: %s %s %s" % (nick, user, args))
+        if len(args) >= 2:
+            cmdargs = args.split(" ")
+            if "!opme" in cmdargs[1] and len(cmdargs) >= 3:
+                logging.debug("[IRC] Received command !opme from %s" % nick)
+                if cmdargs[2] == self.adminpw and host == ("~%s" % self.adminhost):
+                    self.sendSocket("MODE %s +o %s" % (cmdargs[0], nick))
+                    logging.debug("[IRC] Opped %s" % nick)
 
     def server_response(self, client):
         #i = 0
