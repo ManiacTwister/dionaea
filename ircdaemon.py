@@ -103,7 +103,7 @@ class ircclient:
                 if "PING :" in response:
                     client.sendSocket(response.replace("PING", "PONG"))
                     logging.debug("[IRC] Received PING")
-                elif "PRIVMSG :" in response:
+                elif "PRIVMSG " in response:
                     self.parseMessage(response)
                 else:
                     logging.debug("[IRC] Received MSG: %s" % response)
