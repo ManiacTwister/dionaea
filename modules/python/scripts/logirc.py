@@ -90,10 +90,9 @@ class logirc(ihandler):
   def start(self):
     self.s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     self.s.connect("/tmp/ircdaemon")
-    self.sendSocket("CONNECT:s:%s:s:%i:s:%s:s:%s:s:%s:s:%s:s:%s:s:%i" % (self.server, self.port, self.realname, self.ident, self.nick, self.password, self.channel, int(self.ssl)))
+    self.sendSocket("CONNECT:s:%s:s:%i:s:%s:s:%s:s:%s:s:%s:s:%s:s:%i:s:%s:s:%s" % (self.server, self.port, self.realname, self.ident, self.nick, self.password, self.channel, int(self.ssl), self.adminhost, self.adminpw))
     self.state = "Online"
     logger.info("Logirc: connected to local socket")
-    self.sendSocket("SETADMIN:s:%s:s:%s" % (self.adminhost, self.adminpw))
   def stop(self):
     self.sendSocket("DISCONNECT")
     self.state = "Offline"

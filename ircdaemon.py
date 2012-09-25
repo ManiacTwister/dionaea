@@ -13,7 +13,7 @@ logging.basicConfig(filename='irclog.log', format='%(asctime)s;%(levelname)s;%(m
 
 
 class ircclient:
-    def __init__(self, server, port, realname, ident, nick, password, channel, ssl):
+    def __init__(self, server, port, realname, ident, nick, password, channel, ssl, adminpw, adminhost):
         self.server = server
         self.port = port
 
@@ -23,8 +23,8 @@ class ircclient:
         self.channel = channel
         self.state = "offline"
         self.ssl = ssl
-        self.adminpw = None
-        self.adminhost = None
+        self.adminpw = adminpw
+        self.adminhost = adminhost
         #light red
         #purple
         #pink
@@ -176,9 +176,9 @@ class ircclient:
                 data += chunk
         return data
 
-    def setAdminPw(self, host, pw):
+    '''def setAdminPw(self, host, pw):
         self.adminpw = pw
-        self.adminhost = host
+        self.adminhost = host'''
 
 ''' IRC Client end '''
 
@@ -232,16 +232,16 @@ class daemon:
                     daemon.client.send_message(data[1])
             elif data[0] == "CONNECT":
                 logging.debug("[LOCAL] Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
-                daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7], ssl=bool(data[8]))
+                daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7], ssl=bool(data[8]), adminpw=data[9], adminhost=data[10])
                 daemon.client.connect()
             elif data[0] == "DISCONNECT":
                 logging.debug("[LOCAL] Received DISCONNECT")
                 daemon.client.close("Dionaea requested disconnect")
                 daemon.client = None
-            elif data[0] == "SETADMIN":
+            '''elif data[0] == "SETADMIN":
                 logging.debug("[LOCAL] Received SETADMIN %s:%s" % (data[1], data[2]))
                 daemon.adminpw = data[1]
-                daemon.client.setAdminCredentials(data[1], data[2])
+                daemon.client.setAdminCredentials(data[1], data[2])'''
         return
 
     def closeLocalConnection(self):
