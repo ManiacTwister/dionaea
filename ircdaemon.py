@@ -85,6 +85,8 @@ class ircclient:
                 if "PING :" in response:
                     client.sendSocket(response.replace("PING", "PONG"))
                     logging.debug("[IRC] Received PING")
+                else:
+                    logging.debug("[IRC] Received MSG: %s" % response)
             except KeyboardInterrupt:
                 #break
                 pass
