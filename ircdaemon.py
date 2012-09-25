@@ -82,6 +82,7 @@ class ircclient:
         #command = args.pop(0)
         cmd = args[1].split(' ')
         nick, host = prefix.split('!')
+        logging.debug("[IRC] Received command: %s %s %s %s" % (cmd[0], cmd[1], nick, host))
         if "!opme" in cmd[0]:
             logging.debug("[IRC] Received command !opme from %s" % nick)
             if cmd[1] == self.adminpw and host == ("~%s" % self.adminhost):
