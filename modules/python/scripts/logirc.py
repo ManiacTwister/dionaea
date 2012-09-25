@@ -93,7 +93,7 @@ class logirc(ihandler):
     self.sendSocket("CONNECT:s:%s:s:%i:s:%s:s:%s:s:%s:s:%s:s:%s:s:%i" % (self.server, self.port, self.realname, self.ident, self.nick, self.password, self.channel, int(self.ssl)))
     self.state = "Online"
     logger.info("Logirc: connected to local socket")
-    self.sendSocket("SETADMINCREDENTIALS:s:%s:s:%s" % (self.adminhost, self.adminpw))
+    self.sendSocket("SETADMIN:s:%s:s:%s" % (self.adminhost, self.adminpw))
   def stop(self):
     self.sendSocket("DISCONNECT")
     self.state = "Offline"
