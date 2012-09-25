@@ -239,6 +239,7 @@ class daemon:
                 daemon.client.close("Dionaea requested disconnect")
                 daemon.client = None
             elif data[0] == "SETADMINCREDENTIALS":
+                logging.debug("[LOCAL] Received SETADMINCREDENTIALS %s:%s" % (data[1], data[2]))
                 daemon.adminpw = data[1]
                 daemon.client.setAdminCredentials(data[1], data[2])
         return
