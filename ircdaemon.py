@@ -79,7 +79,7 @@ class ircclient:
             args.append(trailing)
         else:
             args = s.split()
-        #command = args.pop(0)
+        command = args.pop(0)
 
         logging.debug("[IRC] Received command: %s %s %s" % (args[0], args[1], prefix))
         if "!opme" in args[1]:
