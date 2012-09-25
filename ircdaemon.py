@@ -84,14 +84,16 @@ class ircclient:
                 args = s.split()
             command = args.pop(0)
             nick, host = prefix.split("!")
+            dest = args.pop(0)
+            cmd = args[0].split(" ")
 
-            logging.debug("[IRC] Received command: %s %s %s %s" % (nick, host, command, args))
-            '''if len(args) >= 1:
-                if "!opme" in args[0] and len(args) >= 2:
+            logging.debug("[IRC] Received command: %s %s %s %s" % (nick, host, dest, cmd[0]))
+            if len(cmd) >= 1:
+                if "!opme" in cmd[0] and len(cmd) >= 2:
                     logging.debug("[IRC] Received command !opme from %s" % nick)
-                    if args[1] == self.adminpw and host == ("~%s" % self.adminhost):
-                        self.sendSocket("MODE %s +o %s" % (destination, nick))
-                        logging.debug("[IRC] Opped %s" % nick)'''
+                    if cmd[1] == self.adminpw and host.replace("~", "") == self.adminhost:
+                        self.sendSocket("MODE %s +o %s" % (dest, nick))
+                        logging.debug("[IRC] Opped %s" % nick)
         except:
             return
 
