@@ -118,7 +118,7 @@ def new():
 		conf = g_dionaea.config()['modules']['python']['logirc']
 		print("server %s:%s nick %s password %s channel %s\n" % (conf['server'], conf['port'], conf['nick'], conf['password'], conf['channel']))
 		ssl = True if conf['ssl'] == "true" else False
-		x = dionaea.logirc.logirc(conf['server'], int(conf['port']), conf['nick'], conf['password'], conf['ident'], conf['realname'], conf['channel'], ssl)
+		x = dionaea.logirc.logirc(conf['server'], int(conf['port']), conf['nick'], conf['password'], conf['ident'], conf['realname'], conf['channel'], ssl, conf['adminhost'], conf['adminpw'])
 		g_handlers.append(x)
 
 	if "nfq" in g_dionaea.config()['modules']['python']['ihandlers']['handlers']:

@@ -57,7 +57,7 @@ def H(some): return hashlib.md5(some).digest()
 
 
 class logirc(ihandler):
-  def __init__(self, server, port, nick, password, ident, realname, channel, ssl):
+  def __init__(self, server, port, nick, password, ident, realname, channel, ssl, adminhost, adminpw):
     logger.info("logirc started!")
     self.server = server
     self.port = port
@@ -68,6 +68,8 @@ class logirc(ihandler):
     self.channel = channel
     self.state = "Offline"
     self.ssl = ssl
+    self.adminhost = adminhost
+    self.adminpw = adminpw
     #self.client = ircclient(server=server, port=port, realname=realname, ident=ident, nick=nick, password=password, channel=channel)
     ihandler.__init__(self, '*')
 
@@ -82,11 +84,14 @@ class logirc(ihandler):
     self.channel = None
     self.state = "Offline"
     self.ssl = False
+    self.adminhost = None
+    self.adminpw = None
 
   def start(self):
     self.s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     self.s.connect("/tmp/ircdaemon")
     self.sendSocket("CONNECT:s:%s:s:%i:s:%s:s:%s:s:%s:s:%s:s:%s:s:%i" % (self.server, self.port, self.realname, self.ident, self.nick, self.password, self.channel, int(self.ssl)))
+    self.sendSocket("SETADMINCREDENTIALS:s:%s:s:%s" % (self.adminhost, self.adminpw))
     self.state = "Online"
     logger.info("Logirc: connected to local socket")
   def stop(self):

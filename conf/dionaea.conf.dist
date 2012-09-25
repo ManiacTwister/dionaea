@@ -418,6 +418,8 @@ modules = {
 			realname = "Honeypot"
 			ident = "Honeypot"
 			ssl = "false"
+			adminhost = "user@host.tld"
+			adminpw = "secret"
 		}
 		nfq = {
 			/** 

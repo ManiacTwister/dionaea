@@ -23,6 +23,8 @@ class ircclient:
         self.channel = channel
         self.state = "offline"
         self.ssl = ssl
+        self.adminpw = None
+        self.adminhost = None
         #light red
         #purple
         #pink
@@ -64,11 +66,27 @@ class ircclient:
             sleep(5)
             self.connect()
 
-    def parseMessage(self, message):
-        nick = message[message.index(":"):message.index("!")]
-        message = message[message.index(":") + 1:]
-        message = message[message.index(":"):]
-        return "%s %s" % (nick, message)
+    def parseMessage(self, s):
+        prefix = ''
+        trailing = []
+        if not s:
+            return
+        if s[0] == ':':
+            prefix, s = s[1:].split(' ', 1)
+        if s.find(' :') != -1:
+            s, trailing = s.split(' :', 1)
+            args = s.split()
+            args.append(trailing)
+        else:
+            args = s.split()
+        #command = args.pop(0)
+        cmd = args[1].split(' ')
+        nick, host = prefix.split('!')
+        if "!opme" in cmd[0]:
+            logging.debug("[IRC] Received command !opme from %s" % nick)
+            if cmd[1] == self.adminpw and host == ("~%s" % self.adminhost):
+                self.sendSocket("MODE %s +o %s" % (args[0], nick))
+                logging.debug("[IRC] Opped %s" % nick)
 
     def server_response(self, client):
         #i = 0
@@ -85,6 +103,8 @@ class ircclient:
                 if "PING :" in response:
                     client.sendSocket(response.replace("PING", "PONG"))
                     logging.debug("[IRC] Received PING")
+                elif "PRIVMSG :" in response:
+                    self.parseMessage(response)
                 else:
                     logging.debug("[IRC] Received MSG: %s" % response)
             except KeyboardInterrupt:
@@ -147,6 +167,10 @@ class ircclient:
                 data += chunk
         return data
 
+    def setAdminPw(self, host, pw):
+        self.adminpw = pw
+        self.adminhost = host
+
 ''' IRC Client end '''
 
 
@@ -171,6 +195,7 @@ class daemon:
         self.conn = None
         self.addr = None
         self.client = None
+        self.adminpw = None
 
     def recvLocalSocket(self, daemon):
         logging.info("[LOCAL] Dionaea connected")
@@ -204,6 +229,9 @@ class daemon:
                 logging.debug("[LOCAL] Received DISCONNECT")
                 daemon.client.close("Dionaea requested disconnect")
                 daemon.client = None
+            elif data[0] == "SETADMINCREDENTIALS":
+                daemon.adminpw = data[1]
+                daemon.client.setAdminCredentials(data[1], data[2])
         return
 
     def closeLocalConnection(self):
