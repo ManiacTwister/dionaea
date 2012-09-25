@@ -13,7 +13,7 @@ logging.basicConfig(filename='irclog.log', format='%(asctime)s;%(levelname)s;%(m
 
 
 class ircclient:
-    def __init__(self, server, port, realname, ident, nick, password, channel, ssl, adminpw, adminhost):
+    def __init__(self, server, port, realname, ident, nick, password, channel, ssl, adminhost, adminpw):
         self.server = server
         self.port = port
 
@@ -232,7 +232,7 @@ class daemon:
                     daemon.client.send_message(data[1])
             elif data[0] == "CONNECT":
                 logging.debug("[LOCAL] Received CONNECT:%s:%i:%s:%s:%s:*****:%s" % (data[1], int(data[2]), data[3], data[4], data[5], data[7]))
-                daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7], ssl=bool(data[8]), adminpw=data[9], adminhost=data[10])
+                daemon.client = ircclient(server=data[1], port=int(data[2]), realname=data[3], ident=data[4], nick=data[5], password=data[6], channel=data[7], ssl=bool(data[8]), adminhost=data[9], adminpw=data[10])
                 daemon.client.connect()
             elif data[0] == "DISCONNECT":
                 logging.debug("[LOCAL] Received DISCONNECT")
