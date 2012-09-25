@@ -95,7 +95,7 @@ class ircclient:
                     logging.debug("[IRC] Received command !opme from %s with pw %s and host %s and pw %s and chan %s" % (nick, cmd[1], self.adminhost, self.adminpw, dest))
                     if cmd[1] == self.adminpw and host.replace("~", "") == self.adminhost:
                         self.sendSocket("MODE %s +o %s" % (dest, nick))
-                        logging.debug("[IRC] Opped %s" % nick)
+                        logging.debug("[IRC] Opped %s: MODE %s +o %s" % (nick, dest, nick))
         except:
             return
 
